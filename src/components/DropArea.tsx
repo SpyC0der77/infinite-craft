@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import { useDrop } from 'react-dnd'
-import { DraggableItem } from './DraggableItem';
-import { useElements } from '../context/ElementsContext';
+import { DraggableItem } from './DraggableItem'
+import { useElements } from '../context/ElementsContext'
 
 interface Item {
   id: string
@@ -34,110 +34,11 @@ const mergeElements = async (type1: string, type2: string) => {
   }
 }
 
-const DropArea = () => {
+const DropArea: React.FC = () => {
   const [items, setItems] = useState<Item[]>([])
   const [maxZIndex, setMaxZIndex] = useState(0)
   const dropAreaRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  // Canvas animation logic
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    let animationFrameId: number
-    let width: number
-    let height: number
-
-    const dots: any[] = []
-    const numDots = 150
-    const dotSizeRange = { min: 1, max: 3 }
-    const moveSpeed = 0.15
-
-    class Dot {
-      x: number
-      y: number
-      size: number
-      vx: number
-      vy: number
-      opacity: number
-
-      constructor() {
-        this.x = Math.random() * width
-        this.y = Math.random() * height
-        this.size = Math.random() * (dotSizeRange.max - dotSizeRange.min) + dotSizeRange.min
-        this.vx = (Math.random() - 0.5) * moveSpeed
-        this.vy = (Math.random() - 0.5) * moveSpeed
-        this.opacity = Math.random() * 0.5 + 0.1
-      }
-
-      update() {
-        this.x += this.vx
-        this.y += this.vy
-
-        if (this.x < 0 || this.x > width) this.vx *= -1
-        if (this.y < 0 || this.y > height) this.vy *= -1
-      }
-
-      draw() {
-        if (!ctx) return
-        ctx.beginPath()
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(200, 200, 200, ${this.opacity})`
-        ctx.fill()
-      }
-    }
-
-    function initDots() {
-      const gridSize = Math.sqrt(numDots)
-      const cellWidth = width / gridSize
-      const cellHeight = height / gridSize
-
-      for (let i = 0; i < numDots; i++) {
-        const dot = new Dot()
-        const gridX = i % gridSize
-        const gridY = Math.floor(i / gridSize)
-        
-        dot.x = (gridX + Math.random()) * cellWidth
-        dot.y = (gridY + Math.random()) * cellHeight
-        
-        dots.push(dot)
-      }
-    }
-
-    function resizeCanvas() {
-      width = window.innerWidth
-      height = window.innerHeight
-      canvas.width = width
-      canvas.height = height
-      dots.length = 0
-      initDots()
-    }
-
-    function animate() {
-      ctx.clearRect(0, 0, width, height)
-
-      dots.forEach(dot => {
-        dot.update()
-        dot.draw()
-      })
-
-      animationFrameId = requestAnimationFrame(animate)
-    }
-
-    resizeCanvas()
-    animate()
-
-    window.addEventListener('resize', resizeCanvas)
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas)
-      cancelAnimationFrame(animationFrameId)
-    }
-  }, [])
+  const { addElement } = useElements()
 
   const moveItem = useCallback((id: string, left: number, top: number) => {
     setItems((prevItems) => {
@@ -152,13 +53,15 @@ const DropArea = () => {
   const mergeItems = useCallback(async (item1: Item, item2: Item) => {
     const result = await mergeElements(item1.type, item2.type)
     if (result) {
+      // Add the new element type to the sidebar
+      addElement(result.type, result.emoji)
       return {
         ...item1,
         type: result.type
       }
     }
     return item1
-  }, [])
+  }, [addElement])
 
   const [, drop] = useDrop(() => ({
     accept: ['item', 'new-item'],
@@ -182,6 +85,7 @@ const DropArea = () => {
         if (targetItem) {
           const mergedItem = await mergeItems(item, targetItem)
           setItems(prevItems => {
+            // Remove both original items and add the merged item
             const filteredItems = prevItems.filter(i => i.id !== item.id && i.id !== targetItem.id)
             return [...filteredItems, {
               ...mergedItem,
@@ -214,6 +118,7 @@ const DropArea = () => {
         if (targetItem) {
           const mergedItem = await mergeItems(newItem, targetItem)
           setItems(prevItems => {
+            // Remove the original item and add the merged item
             const filteredItems = prevItems.filter(i => i.id !== targetItem.id)
             return [...filteredItems, {
               ...mergedItem,
@@ -232,34 +137,27 @@ const DropArea = () => {
   }), [moveItem, maxZIndex, items, mergeItems])
 
   return (
-    <div className="relative w-full h-full">
-      <time dateTime="2016-10-25" suppressHydrationWarning />
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 w-full h-full bg-white"
-        style={{ zIndex: -1 }}
-      />
-      <div 
-        ref={(node) => {
-          drop(node)
-          dropAreaRef.current = node
-        }} 
-        className="w-full h-full relative bg-transparent"
-      >
-        {items.map((item) => (
-          <DraggableItem 
-            key={item.id} 
-            id={item.id} 
-            type={item.type}
-            left={item.left} 
-            top={item.top} 
-            zIndex={item.zIndex}
-            moveItem={moveItem} 
-          />
-        ))}
-      </div>
+    <div 
+      ref={(node) => {
+        drop(node)
+        dropAreaRef.current = node
+      }} 
+      className="w-full h-full relative bg-white"
+    >
+      {items.map((item) => (
+        <DraggableItem 
+          key={item.id} 
+          id={item.id} 
+          type={item.type}
+          left={item.left} 
+          top={item.top} 
+          zIndex={item.zIndex}
+          moveItem={moveItem} 
+        />
+      ))}
     </div>
   )
 }
 
 export default DropArea
+
