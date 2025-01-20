@@ -15,10 +15,10 @@ export const DragAndDrop: React.FC = () => {
     <DndProvider backend={HTML5Backend}>
       <ElementsProvider>
         <div className={`w-full h-screen flex ${roboto.className}`}>
-          <Sidebar />
           <div className="flex-1">
             <DynamicDropArea />
           </div>
+          <Sidebar />
         </div>
       </ElementsProvider>
     </DndProvider>
