@@ -20,8 +20,8 @@ export function ElementsProvider({ children }: { children: React.ReactNode }) {
   const [elements, setElements] = useState<Map<string, Element>>(new Map([
     ['water', { type: 'water', emoji: '💧', text: 'Water' }],
     ['fire', { type: 'fire', emoji: '🔥', text: 'Fire' }],
-    ['earth', { type: 'earth', emoji: '🌿', text: 'Earth' }],
-    ['air', { type: 'air', emoji: '💨', text: 'Air' }],
+    ['earth', { type: 'earth', emoji: '🌎', text: 'Earth' }],
+    ['wind', { type: 'wind', emoji: '💨', text: 'Wind' }],
   ]))
 
   const addElement = useCallback((type: string, emoji: string) => {
