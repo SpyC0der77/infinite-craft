@@ -42,7 +42,7 @@ export const Sidebar: React.FC = () => {
   const { elements, getElementContent } = useElements()
 
   return (
-    <div className="w-64 h-full bg-gray-100 p-4 overflow-y-auto">
+    <div className="w-64 h-full bg-gray-100 p-4 overflow-y-auto fixed top-0 right-0">
       <h2 className="text-xl font-bold mb-4">Elements</h2>
       <div className="flex flex-wrap gap-2">
         {Array.from(elements.values()).map((element) => (
