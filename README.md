@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Infinite Craft
 
-## Getting Started
+A browser-based element-combining game inspired by Infinite Craft. Start with Water, Fire, Earth, and Wind, then drag elements onto the workspace and drop one onto another to discover a new element.
 
-First, run the development server:
+[Live demo](https://open-craft.vercel.app)
+
+## What it does
+
+- Drag and move elements on a freeform workspace.
+- Search the sidebar for discovered elements.
+- Combination results come from `infiniteback.org` through `corsproxy.io`.
+
+## Run locally
+
+Use Node.js 18.18+ and npm.
 
 ```bash
+git clone https://github.com/SpyC0der77/infinite-craft.git
+cd infinite-craft
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Build the production app |
+| `npm run start` | Serve a production build |
 
-## Learn More
+The `lint` script calls the legacy `next lint` command. To run ESLint directly with the included flat config, use `npx eslint .`.
 
-To learn more about Next.js, take a look at the following resources:
+Run `build` before `start`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Dependencies and limitations
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Discoveries live in React state and reset when the page reloads. Combining elements requires both external services to be available. No API key is configured in this repo.
 
-## Deploy on Vercel
+## Source layout
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [`src/components/DropArea.tsx`](src/components/DropArea.tsx): Workspace and combination requests.
+- [`src/context/ElementsContext.tsx`](src/context/ElementsContext.tsx): Starting elements and discoveries.
+- [`src/components/Sidebar.tsx`](src/components/Sidebar.tsx): Element list and search.
